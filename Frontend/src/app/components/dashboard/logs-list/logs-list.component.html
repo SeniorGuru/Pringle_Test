@@ -1,0 +1,9 @@
+<div class="logs-list-main">
+  <ul class="list-group">
+    <li class="list-group-item" *ngFor="let item of log_list; let i = index">
+      <div> {{item.type}}</div>
+      <div> {{item.amount}}</div>
+      <div> {{changeDateType(item.createdDate)}}</div>
+    </li>
+  </ul>
+</div>

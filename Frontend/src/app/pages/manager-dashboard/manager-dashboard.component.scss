@@ -1,0 +1,38 @@
+.manager-dashboard-main {
+  .row {
+    height: 500px;
+    margin-top: 20px;
+
+    ::-webkit-scrollbar {
+      display: none;
+    }
+  }
+  .col-sm-2 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .col-sm-4 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .col-sm-6 {
+    overflow: scroll;
+    height: 100%;
+  }
+  .overview {
+    width: 100%;
+  }
+  .management {
+    width: 100%;
+  }
+  .alert {
+    display: flex;
+    align-items: center;
+  }
+  .confirm-btn {
+    display: flex;
+    margin-left: auto;
+  }
+}
