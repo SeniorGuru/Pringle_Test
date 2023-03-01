@@ -3,8 +3,8 @@
     <agm-map
 
       [mapTypeId]="'roadmap'"
-      [latitude]="53.65914"
-      [longitude]="0.072050"
+      [latitude]="centerIndex == -1 ? 53.65914 : points[centerIndex].latitude"
+      [longitude]="centerIndex == -1 ? 0.072050 : points[centerIndex].longitude"
       [styles]="Styles"
       [backgroundColor]="'#fffff'"
       [zoom]="1.8"
@@ -18,8 +18,7 @@
             [longitude]="point.longitude"
             [markerDraggable]="point.is_block ? true : false"
             [label]="labelOptions[i]"
-            [iconUrl]="stringToNumber(labelOptions[i].text) >= -1 ?
-            point.repair !== 'Repair' ? './assets/images/map-marker-enable.png' : './assets/images/repair.png' : './assets/images/alert.gif'"
+            [iconUrl]="stringToNumber(labelOptions[i].text) >= point.minAmount ? './assets/images/map-marker-enable.png' : './assets/images/alert.gif'"
         >
 
           <div style="width : 50px; height:50px; border: 1px solid red;"></div>

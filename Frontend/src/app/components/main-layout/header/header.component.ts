@@ -16,6 +16,7 @@ export class HeaderComponent implements OnInit {
 
   onSignOut(): void {
     removeItem('access_token');
+    removeItem('user_email');
     this.router.navigate(['/auth/signin']);
   }
 

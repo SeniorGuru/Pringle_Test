@@ -1,5 +1,5 @@
 <div class="manager-dashboard-main">
-  <div class="row">
+  <div class="row gy-3">
     <div class="col-sm-12">
       <div *ngFor="let item of notify_list; let i = index">
         <div
@@ -7,7 +7,7 @@
           class="alert"
           [ngClass]="item.flag ? 'alert-primary' : 'alert-danger'"
         >
-          <div style="margin-right: 200px">
+          <div class="name">
             {{item.tankName}}
           </div>
           <div>

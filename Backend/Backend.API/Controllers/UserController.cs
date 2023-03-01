@@ -77,6 +77,7 @@ namespace Backend.API.Controllers
         }
         #endregion
 
+
         #region RegisterManager
         // Method to Register Manager
         [HttpPost]
@@ -129,6 +130,7 @@ namespace Backend.API.Controllers
             }
         }
         #endregion
+
 
         #region GenerateToken
         // To generate token

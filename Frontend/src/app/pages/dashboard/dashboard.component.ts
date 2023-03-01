@@ -13,7 +13,7 @@ import { authorization } from 'src/app/utils/helper';
 export class DashboardComponent implements OnInit {
 
   tank_list: Array<Asset> = [];
-  selected_index: number = 0;
+  selected_index: number = -1;
 
   constructor() {
   }

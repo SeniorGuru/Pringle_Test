@@ -16,7 +16,7 @@
     </div>
     <div class="col col-sm-6">
       <p class="result">
-        1488 Assets found
+        {{listData.length}} Assets found
       </p>
     </div>
   </div>
@@ -44,7 +44,7 @@
     <div class="list-footer">
       <p class="label">Rows Per Page</p>
       <div class="indicator">
-          {{this.perPageCount * this.pageIndex + 1}} - {{this.perPageCount * this.pageIndex + this.perPageList.length}} of {{assetList.length}}
+          {{this.perPageCount * this.pageIndex + 1}} - {{this.perPageCount * (this.pageIndex + 1) + this.perPageList.length}} of {{assetList.length}}
           <div class="prev-btn" (click)="goToPrev()">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
               <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
@@ -135,11 +135,24 @@
         </div>
 
         <div class="detail" *ngIf="viewDetail === true">
-          <div class="list" *ngFor="let item of logList; let i = index">
-            <div> {{item.type}} </div>
-            <div> {{item.amount}} </div>
-            <div> {{changeDateType(item.createdDate)}}</div>
-          </div>
+          <table class="table">
+            <thead>
+              <tr>
+                <th> Type </th>
+                <th> From </th>
+                <th> Amount </th>
+                <th> Date </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of logList; let i = index">
+                <td> {{item.type}} </td>
+                <td> {{item.from}} </td>
+                <td> {{item.amount}} </td>
+                <td> {{changeDateType(item.createdDate)}} </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

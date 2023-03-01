@@ -47,7 +47,7 @@ export class OverviewComponent implements OnInit {
     this.count = tankCount;
     this.latitude = latitude;
     this.longitude = longitude;
-    // this.initWebSocket()
+    this.initWebSocket()
   }
 
   async initWebSocket(): Promise<void> {

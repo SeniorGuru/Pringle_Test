@@ -15,17 +15,16 @@ import { authorization } from 'src/app/utils/helper';
 
 export class MapviewComponent implements OnInit, OnChanges {
   @Input() listData: Array<any> = [];
-  @Input() centerIndex: number = 0;
+  @Input() centerIndex: number = -1;
 
   points : Array<any> = [] ;
-  commandList: Array<any> = [];
 
   select_fill_oil_cmd : boolean = false;
   select_repair_tank_cmd : boolean = false;
   index: number = 0;
 
   isShowDataInfo :boolean = false ;
-  zoom: number = 1;
+  zoom: number = 1.8;
   current_opened_index : number = -1 ;
 
   // isShowDataInfo : boolean = false ;
@@ -65,7 +64,7 @@ export class MapviewComponent implements OnInit, OnChanges {
   fontSize: '18px',
   fontWeight: 'bold',
   text: "87"
-}]
+  }]
 
   endpoints_arr : Array<any> = [];
 
@@ -236,20 +235,11 @@ export class MapviewComponent implements OnInit, OnChanges {
     const header = authorization();
 
     const res =  await axios.get(`${PRIVATE_URI}Command`, header);
-
-    if(res.status === 200) {
-      for(let i = 0 ; i < this.listData.length ; i++) {
-        for (let j = 0 ; j < res.data.length ; j++) {
-          if(res.data[j].tankName === this.listData[i].tankName && res.data[j].command === 'Repair')
-            this.commandList[i] = res.data[j];
-            console.log(this.commandList);
-        }
-      }
-    }
   }
 
   ngOnChanges(changes:SimpleChanges) {
     let options = [];
+    console.log(this.centerIndex)
     for(let i = 0 ; i < this.listData.length ; i++) {
       options.push({
         color: 'white',
@@ -262,7 +252,6 @@ export class MapviewComponent implements OnInit, OnChanges {
 
     let tank_data = [];
     for (let i = 0 ; i < this.listData.length ; i++) {
-      console.log(this.commandList[i])
       tank_data.push({
           "endpoint": "185.155.103.59",
           "country_code": "DE",
@@ -270,7 +259,8 @@ export class MapviewComponent implements OnInit, OnChanges {
           "latitude": this.listData[i].latitude,
           "longitude": this.listData[i].longitude,
           "minAmount": this.listData[i].minAmount,
-          "repair": this.commandList[i]?.command
+          'userEmail': this.listData[i].userEmail,
+          "period": this.listData[i].period
       })
     }
     this.labelOptions = options;
@@ -352,4 +342,16 @@ export class MapviewComponent implements OnInit, OnChanges {
 
   }
 
+  async isRepair(item: any): Promise<void> {
+    const header = authorization();
+
+    let res = await axios.post(`${PRIVATE_URI}IsRepair`, {
+      user_email: item.userEmail,
+      period: item.period,
+    }, header);
+
+    if(res.status === 200) {
+      return res.data;
+    }
+  }
 }

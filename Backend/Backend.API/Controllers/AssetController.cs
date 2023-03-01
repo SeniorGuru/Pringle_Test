@@ -71,6 +71,41 @@ namespace Backend.Controllers
         #endregion
 
 
+        #region RepairAsset
+        [HttpPost]
+        [Route("/IsRepair")]
+        [ProducesResponseType(typeof(Boolean), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> IsRepair(RepairAssetVM model)
+        {
+            try
+            {
+                var assets = await _genericService.GetAssetsList();
+                if (assets.Where(x => x.UserEmail == model.UserEmail).Count() == 0)
+                    return BadRequest("Can't find user email");
+
+                var asset = assets.Where(x => x.UserEmail == model.UserEmail).First();
+
+                if (DateTime.UtcNow > asset.UpdatedDate.AddDays(model.Period))
+                    return Ok(true);
+
+                else
+                    return Ok(false);
+
+            }
+            catch (Exception ex)
+            {
+                var msg = $"Method: IsRepair, Exception: {ex.Message}";
+
+                _logger.LogError(msg);
+
+                return Problem(title: "/AssetController/RepairAsset", detail: ex.Message, statusCode: StatusCodes.Status500InternalServerError);
+            }
+        }
+        #endregion
+
+
         #region TotalAsset
         [HttpPost]
         [Route("/TotalAsset/{UserEmail}")]
@@ -161,6 +196,7 @@ namespace Backend.Controllers
         }
         #endregion
 
+
         #region BuyAsset
         [HttpPost]
         [Route("/BuyAsset")]
@@ -212,6 +248,7 @@ namespace Backend.Controllers
 
         }
         #endregion
+
 
         #region SellAsset
         [HttpPost]
@@ -266,6 +303,7 @@ namespace Backend.Controllers
 
         }
         #endregion
+
 
         #region SaveAssetDetail
         // Method to Save the Asset detail
@@ -379,6 +417,7 @@ namespace Backend.Controllers
         }
         #endregion
 
+
         #region UpdateAsset
         [HttpPut]
         [Route("{id}")]
@@ -416,6 +455,8 @@ namespace Backend.Controllers
             }
         }
         #endregion
+
+
         #region DeleteAsset
         // Method to delete the Asset detail
         [HttpDelete(Name = "DeleteAsset")]
@@ -441,6 +482,9 @@ namespace Backend.Controllers
             }
         }
         #endregion
+
+
+        #region GetCurrentUser
         private UserEntity GetCurrentUser()
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
@@ -459,5 +503,6 @@ namespace Backend.Controllers
 
             return null;
         }
+        #endregion
     }
 }

@@ -13,7 +13,7 @@ export class AssetsListComponent implements OnInit, OnChanges {
   @Input() listData: any = [];
   @Output() newSelectedEvent: EventEmitter<number> = new EventEmitter();
 
-  index: number = 0;
+  index: number = -1;
   logList: Array<any> = [];
   viewDetail: boolean = false;
 
@@ -58,18 +58,22 @@ export class AssetsListComponent implements OnInit, OnChanges {
   }
 
   onChangeIndex(i: number) {
+    this.viewDetail = false;
     this.index = i
     this.newSelectedEvent.emit(this.index);
   }
 
   async onViewDetail() {
     this.viewDetail = !this.viewDetail;
+    this.logList = [];
     const header = authorization();
 
     let res = await axios.get(`${PRIVATE_URI}Log`, header);
 
     if(res.status === 200) {
+      console.log(res.data)
       for( let i = res.data.length-1 ; i >= 0 ; i--) {
+        // console.log(this.listData[this.index], res.data[i].userEmail)
         if(res.data[i].userEmail === this.listData[this.index].userEmail)
           this.logList.push(res.data[i])
       }

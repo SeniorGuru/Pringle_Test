@@ -42,14 +42,12 @@ export class SigninComponent implements OnInit {
       userEmail: this.loginForm.value.email,
       password: this.loginForm.value.pwd,
     }) .then(function (response) {
-      if(response.data.statusCode === 200) {
-        setItem('access_token', response.data.value)
+        setItem('access_token', response.data)
         setItem('user_email', userEmail)
         if(userEmail === 'admin')
           trouter.navigate(['/dashboard'])
         else
           trouter.navigate(['/dashboard/manager'])
-      }
     }) .catch(function (error) {
       alert(error)
       console.log(error)

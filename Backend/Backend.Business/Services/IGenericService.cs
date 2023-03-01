@@ -93,6 +93,7 @@ namespace Backend.Business.Services
         }
         #endregion
 
+
         #region Command
         public async Task<IEnumerable<CommandEntity>> GetCommandsList()
         {
@@ -120,6 +121,7 @@ namespace Backend.Business.Services
         }
         #endregion
 
+
         #region User
         public async Task<IEnumerable<UserEntity>> GetUsersList()
         {
@@ -146,6 +148,7 @@ namespace Backend.Business.Services
             await _assetRepository.DeleteUser(Id);
         }
         #endregion
+
 
         #region Logs
         public async Task<IEnumerable<LogEntity>> GetLogsList()

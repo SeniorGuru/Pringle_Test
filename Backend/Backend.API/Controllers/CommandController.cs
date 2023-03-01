@@ -61,6 +61,7 @@ namespace Backend.API.Controllers
         }
         #endregion
 
+
         #region SaveCommandDetail
         // Method to Save the Command detail
         [HttpPost(Name = "SaveCommandDetail")]
@@ -115,6 +116,7 @@ namespace Backend.API.Controllers
         }
         #endregion
 
+
         #region UpdateCommand
         // Update Command Method
         [HttpGet]
@@ -165,6 +167,7 @@ namespace Backend.API.Controllers
             }
         }
         #endregion
+
 
         #region DeleteCommand
         // Method to delete the Command detail

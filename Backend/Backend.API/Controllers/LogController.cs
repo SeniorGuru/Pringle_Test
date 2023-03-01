@@ -29,6 +29,7 @@ namespace Backend.API.Controllers
             _messageHub = messageHub;
         }
 
+
         #region GetLogsList
         // Method to get the list of the Logs
         [HttpGet]
@@ -58,6 +59,7 @@ namespace Backend.API.Controllers
             }
         }
         #endregion
+
 
         #region SaveLogDetails
         [HttpPost]

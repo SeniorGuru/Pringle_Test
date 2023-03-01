@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace Backend.API.ViewModel
 {
-    public class GetAssetVM
+    public partial class GetAssetVM
     {
         [Required]
         [JsonPropertyName("tank_name")]
@@ -46,7 +46,7 @@ namespace Backend.API.ViewModel
         public UserVM? Owner { get; set; }
     }
 
-    public class PostTotalAsset
+    public partial class PostTotalAsset
     {
         public int Count { get; set; }
 
@@ -57,7 +57,18 @@ namespace Backend.API.ViewModel
         public float? Latitude { get; set; }
     }
 
-    public class BuyAsset
+    public partial class RepairAssetVM
+    {
+        [Required]
+        [JsonPropertyName("user_email")]
+        public string UserEmail { get; set; }
+
+        [Required]
+        [JsonPropertyName("period")]
+        public int Period { get; set; }
+    }
+
+    public partial class BuyAsset
     {
         [Required]
         [JsonPropertyName("user_email")]
@@ -73,7 +84,7 @@ namespace Backend.API.ViewModel
         public string From { get; set; }
     }
 
-    public class SellAsset
+    public partial class SellAsset
     {
         [Required]
         [JsonPropertyName("user_email")]
@@ -90,7 +101,7 @@ namespace Backend.API.ViewModel
 
         public string From { get; set; }
     }
-    public class PostAssetVM
+    public partial class PostAssetVM
     {
         [Required]
         public string? TankName { get; set; }

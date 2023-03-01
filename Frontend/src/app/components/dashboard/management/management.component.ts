@@ -63,23 +63,27 @@ export class ManagementComponent implements OnInit, OnChanges {
       if(this.own_command[i].command === 'Fill') {
         let command = this.own_command[i];
         if(fillCount === 0)
-            axios.post(`${PRIVATE_URI}BuyAsset`, {
+            await axios.post(`${PRIVATE_URI}BuyAsset`, {
               userEmail: this.userEmail,
-              amount: Number(this.buyAmount)
-            }, header) .then(async function (response) {
+              amount: Number(this.buyAmount),
+              from: this.buyer
+            }, header) .then(function (response) {
               alert("Successfully purchased")
+              fillCount++;
+              console.log(fillCount)
 
             }) .catch(function (error) {
               alert(error.response.data)
             })
-
+        console.log(fillCount)
         if(fillCount !== 0)
             await axios.get(`${PRIVATE_URI}Command/${command.id}`, header)
-              .then(function(res) {
-                axios.post(`${PRIVATE_URI}TotalAsset/${command.userEmail}`, {}, header)
+              .then(async function(res) {
+                await axios.post(`${PRIVATE_URI}TotalAsset/${command.userEmail}`, {}, header)
+                .then(function() {console.log('asdfsfd')})
+                .catch(function(error) { console.log(error)})
               })
 
-        fillCount++;
       }
     }
     if(fillCount === 0) {
