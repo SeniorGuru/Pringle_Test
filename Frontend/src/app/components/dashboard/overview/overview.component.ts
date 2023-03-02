@@ -10,50 +10,60 @@ import { authorization, getItem } from 'src/app/utils/helper';
   templateUrl: './overview.component.html',
   styleUrls: ['./overview.component.scss']
 })
-export class OverviewComponent implements OnInit {
+export class OverviewComponent implements OnInit, OnChanges {
+
+  @Input() tank_count: number = 0;
 
   private hubConnectionBuilder!: HubConnection;
 
   user_email = getItem('user_email');
 
   totalAssets: number = 0;
-  assets: number = 0;
   count: number = 0;
-  latitude: number = 0;
-  longitude: number = 0;
+  // assets: number = 0;
+  // latitude: number = 0;
+  // longitude: number = 0;
+  managerAsset: any;
 
   constructor( ) {
   }
 
   async ngOnInit() {
+    let userEmail = this.user_email
     let totalAmount: number = 0
     let tankCount: number = 0;
-    let latitude: number = 0;
-    let longitude: number = 0;
+    let mng_assets: any;
 
     const header = authorization();
 
-    await axios.post(`${PRIVATE_URI}TotalAsset/${this.user_email}`,{}, header).then (function(res) {
+
+    await axios.get(`${PRIVATE_URI}TotalAsset/${this.user_email}`, header).then (function(res) {
       totalAmount = res.data.totalAmount;
       tankCount = res.data.count;
-      latitude = res.data.latitude;
-      longitude = res.data.longitude;
+
+      for(let i = 0 ; i < res.data.assets.length ; i++ ) {
+        if(userEmail === res.data.assets[i].userEmail) {
+          mng_assets = res.data.assets[i]
+        }
+      }
     }).catch(function(error) {
       console.log(error)
     })
 
     this.totalAssets = totalAmount;
-    this.assets = totalAmount;
     this.count = tankCount;
-    this.latitude = latitude;
-    this.longitude = longitude;
+    this.managerAsset = mng_assets;
     this.initWebSocket()
+  }
+
+  ngOnChanges(changes:SimpleChanges) {
+    this.count = this.tank_count;
   }
 
   async initWebSocket(): Promise<void> {
 
     this.hubConnectionBuilder = new HubConnectionBuilder()
-      .withUrl('https://10.10.18.211:5001/commands')
+      .withUrl('https://10.10.18.211:5001/assets')
       .configureLogging(LogLevel.Information)
       .build();
     this.hubConnectionBuilder
@@ -62,11 +72,13 @@ export class OverviewComponent implements OnInit {
       .catch(err => console.log('Error while connect with server'));
 
     this.hubConnectionBuilder.on('SendTotalAsset', (data: any) => {
-      if(this.user_email !== 'admin') {
-        this.assets = data.totalAmount;
-        this.count = data.count;
-        this.totalAssets += (data.totalAmount - this.assets);
-        console.log(this.totalAssets)
+      this.totalAssets = 0;
+
+      for(let i = 0 ; i < data.assets.length ; i++ ) {
+        this.totalAssets += data.assets[i].amount
+        if(this.user_email === data.assets[i].userEmail) {
+          this.managerAsset = data.assets[i];
+        }
       }
     });
 

@@ -5,7 +5,7 @@ import { getName, getCode } from 'country-list';
 import { MapTypeStyle } from '@agm/core';
 import axios from 'axios';
 import { PRIVATE_URI } from 'src/app/constant/static';
-import { authorization } from 'src/app/utils/helper';
+import { authorization, formatDBDate } from 'src/app/utils/helper';
 
 @Component({
   selector: 'app-mapview',
@@ -14,25 +14,33 @@ import { authorization } from 'src/app/utils/helper';
 })
 
 export class MapviewComponent implements OnInit, OnChanges {
+  // tank assets list
   @Input() listData: Array<any> = [];
+
+  //selected item on asset-list
   @Input() centerIndex: number = -1;
 
+  //customize listData
   points : Array<any> = [] ;
+  isRepair: Array<boolean> = [];
 
+  //view logs
+  logList: Array<any> = [];
+  viewDetail: boolean = false;
+
+  //check command(fill or repair)
   select_fill_oil_cmd : boolean = false;
   select_repair_tank_cmd : boolean = false;
+
+  //selected item on map
   index: number = 0;
 
-  isShowDataInfo :boolean = false ;
   zoom: number = 1.8;
   current_opened_index : number = -1 ;
 
-  // isShowDataInfo : boolean = false ;
-  current_info : any ;
-
   // initial center position for the map
-  ct_lat: number = 0;
-  ct_lng: number = 0;
+  ct_lat: number = 53.65914;
+  ct_lng: number = 0.072050;
 
   labelOptions = [{
       color: 'white',
@@ -237,9 +245,9 @@ export class MapviewComponent implements OnInit, OnChanges {
     const res =  await axios.get(`${PRIVATE_URI}Command`, header);
   }
 
-  ngOnChanges(changes:SimpleChanges) {
+  async ngOnChanges(changes:SimpleChanges) {
     let options = [];
-    console.log(this.centerIndex)
+
     for(let i = 0 ; i < this.listData.length ; i++) {
       options.push({
         color: 'white',
@@ -259,24 +267,20 @@ export class MapviewComponent implements OnInit, OnChanges {
           "latitude": this.listData[i].latitude,
           "longitude": this.listData[i].longitude,
           "minAmount": this.listData[i].minAmount,
+          "userName": this.listData[i].tankName,
           'userEmail': this.listData[i].userEmail,
           "period": this.listData[i].period
       })
     }
     this.labelOptions = options;
     this.points = tank_data;
+
+    await this.checkedRepair();
   }
 
   isOpened(index : number) {
     if(index === this.current_opened_index) return true;
     return false;
-  }
-
-  showEndpointInfo(data: any) {
-    this.current_info = data;
-    // this.isShowDataInfo = true ;
-
-    return ;
   }
 
   clickedMarker(label: string, index: number) {
@@ -285,6 +289,7 @@ export class MapviewComponent implements OnInit, OnChanges {
 
   handleOpenModal(i: number) {
     this.index = i;
+    this.viewDetail = false;
     (<any>$("#tankSituation")).modal('show')
   }
 
@@ -303,8 +308,9 @@ export class MapviewComponent implements OnInit, OnChanges {
   }
 
   async submitCommand() {
-
     const header = authorization();
+
+
     if(this.select_fill_oil_cmd ) {
       try {
 
@@ -342,16 +348,41 @@ export class MapviewComponent implements OnInit, OnChanges {
 
   }
 
-  async isRepair(item: any): Promise<void> {
+  async checkedRepair() {
+
     const header = authorization();
 
-    let res = await axios.post(`${PRIVATE_URI}IsRepair`, {
-      user_email: item.userEmail,
-      period: item.period,
-    }, header);
+    for(let i = 0 ; i < this.points.length ; i++) {
+      let res = await axios.post(`${PRIVATE_URI}IsRepair`, {
+        userEmail: this.points[i].userEmail,
+        period: this.points[i].period,
+      }, header);
+
+      if(res.status === 200) {
+        this.isRepair[i] = true;
+      } else {
+        this.isRepair[i] = false;
+      }
+    }
+
+  }
+
+  async onViewDetail() {
+    this.viewDetail = !this.viewDetail;
+    this.logList = [];
+    const header = authorization();
+
+    let res = await axios.get(`${PRIVATE_URI}Log`, header);
 
     if(res.status === 200) {
-      return res.data;
+      for( let i = res.data.length-1 ; i >= 0 ; i--) {
+        if(res.data[i].userEmail === this.listData[this.index].userEmail)
+          this.logList.push(res.data[i])
+      }
     }
   }
+  changeDateType(db_date: any) {
+    return formatDBDate(db_date)
+  }
+
 }

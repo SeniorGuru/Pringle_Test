@@ -31,8 +31,9 @@ export class NotificationsComponent implements OnInit {
       .catch(err => console.log('Error while connect with server'));
 
     this.hubConnectionBuilder.on('SendCommands', (data: any) => {
-      console.log(data)
-      this.notify_list = data;
+      for(let i = 0 ; i < data.length ; i++) {
+        this.notify_list[i] = data[data.length - i - 1]
+      }
     });
 
   }

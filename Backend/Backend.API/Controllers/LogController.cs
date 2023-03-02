@@ -42,12 +42,15 @@ namespace Backend.API.Controllers
             try
             {
                 var result = await _genericService.GetLogsList();
-                IEnumerable<LogEntity> models = _mapper.Map<IEnumerable<LogEntity>>(result);
+                List<LogVM> models = _mapper.Map<IEnumerable<LogVM>>(result).ToList();
 
-                if (result == null)
+                await _messageHub.Clients.All.SendLogs(models);
+
+                if (models == null)
                 {
                     return NotFound();
                 }
+
                 return Ok(models);
             }
             catch(Exception ex) {

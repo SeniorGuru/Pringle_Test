@@ -46,7 +46,7 @@ export class AssetsListComponent implements OnInit, OnChanges {
   }
 
   goToNext() {
-    if(this.pageIndex === this.pageCount-1) return ;
+    if(this.pageIndex === this.pageCount) return ;
     this.pageIndex++;
     this.changePerPageList() ;
   }
@@ -71,9 +71,7 @@ export class AssetsListComponent implements OnInit, OnChanges {
     let res = await axios.get(`${PRIVATE_URI}Log`, header);
 
     if(res.status === 200) {
-      console.log(res.data)
       for( let i = res.data.length-1 ; i >= 0 ; i--) {
-        // console.log(this.listData[this.index], res.data[i].userEmail)
         if(res.data[i].userEmail === this.listData[this.index].userEmail)
           this.logList.push(res.data[i])
       }

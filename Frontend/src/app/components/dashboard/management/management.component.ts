@@ -67,36 +67,37 @@ export class ManagementComponent implements OnInit, OnChanges {
               userEmail: this.userEmail,
               amount: Number(this.buyAmount),
               from: this.buyer
-            }, header) .then(function (response) {
+            }, header) .then(function () {
+              axios.get(`${PRIVATE_URI}Log`, header);
               alert("Successfully purchased")
               fillCount++;
-              console.log(fillCount)
-
             }) .catch(function (error) {
-              alert(error.response.data)
+              alert(error.response.data.title)
             })
-        console.log(fillCount)
+
         if(fillCount !== 0)
             await axios.get(`${PRIVATE_URI}Command/${command.id}`, header)
               .then(async function(res) {
-                await axios.post(`${PRIVATE_URI}TotalAsset/${command.userEmail}`, {}, header)
+                await axios.get(`${PRIVATE_URI}TotalAsset/${command.userEmail}`, header)
                 .then(function() {console.log('asdfsfd')})
-                .catch(function(error) { console.log(error)})
+                .catch(function(error) { console.log(error.response.data.title)})
               })
 
       }
     }
+
     if(fillCount === 0) {
       const user_email = this.userEmail;
       axios.post(`${PRIVATE_URI}BuyAsset`, {
         userEmail: this.userEmail,
         amount: Number(this.buyAmount),
         from: this.buyer
-      }, header) .then(function (response) {
+      }, header) .then(async function () {
         alert("Successfully purchased")
-        axios.post(`${PRIVATE_URI}TotalAsset/${user_email}`, {}, header)
+        await axios.get(`${PRIVATE_URI}Log`, header);
+        await axios.get(`${PRIVATE_URI}TotalAsset/${user_email}`, header)
       }) .catch(function(error) {
-        console.log(error);
+        alert(error.response.data.title)
       })
     }
   }
@@ -111,20 +112,50 @@ export class ManagementComponent implements OnInit, OnChanges {
       from: this.seller
     }, header) .then(function(res) {
       alert('Successfully sold')
-      axios.post(`${PRIVATE_URI}TotalAsset/${user_email}`, {}, header)
+      axios.get(`${PRIVATE_URI}TotalAsset/${user_email}`, header)
+      axios.get(`${PRIVATE_URI}Log`, header);
     }) .catch(function(error) {
-      alert("Rest amount is below the min amount")
+      console.log(error)
+      alert(error.response.data.title)
     })
 
   }
 
   async onRepair() {
     const header = authorization();
+    let repairCount = 0;
 
     for(let i = 0 ; i < this.own_command.length ; i++) {
       if(this.own_command[i].command === 'Repair') {
-        await axios.get(`${PRIVATE_URI}Command/${this.own_command[i].id}`, header);
+        if(repairCount === 0) {
+            try{
+              let res = await axios.get(`${PRIVATE_URI}RepairAsset/${this.userEmail}`, header)
+              if(res.status === 200) {
+                alert("Successfully repaired");
+                repairCount++;
+                axios.get(`${PRIVATE_URI}Log`, header);
+              }
+            } catch(error) {
+              alert(error)
+            }
+        }
 
+        if(repairCount !== 0) {
+          await axios.get(`${PRIVATE_URI}Command/${this.own_command[i].id}`, header);
+        }
+
+      }
+    }
+
+    if(repairCount === 0) {
+      try{
+          let res = await axios.get(`${PRIVATE_URI}RepairAsset/${this.userEmail}`, header)
+          if(res.status === 200) {
+            alert("Successfully repaired");
+            axios.get(`${PRIVATE_URI}Log`, header);
+          }
+      } catch(error) {
+        alert(error)
       }
     }
   }

@@ -66,4 +66,16 @@
       border: 1px solid white;
     }
   }
+
+  .detail {
+    height: 250px;
+    overflow: scroll;
+    padding: 10px 20px;
+
+    .list {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  }
 }

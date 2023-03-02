@@ -19,23 +19,23 @@
         <div class="modal-body">
           <form >
             <div class="mb-3 mt-3">
-              <label for="name" class="form-label">Name:</label>
+              <label for="name" class="form-label">Manger Name:</label>
               <input
                 class="form-control"
-                id="name"
+                id="managerName"
                 placeholder="Enter Name"
-                name="name"
+                name="managerName"
                 [value]="name"
                 (change)="onNameChange($event)"
               >
             </div>
             <div class="mb-3 mt-3">
-              <label for="email" class="form-label">Email:</label>
+              <label for="email" class="form-label">Manager Email:</label>
               <input
                 class="form-control"
-                id="email"
+                id="managerEmail"
                 placeholder="Enter Email"
-                name="email"
+                name="managerEmail"
                 [value]="email"
                 (change)="onEmailChange($event)"
               >
@@ -43,7 +43,7 @@
             <div class="mb-3">
               <label for="password" class="form-label">Password:</label>
               <input
-                type="text"
+                type="password"
                 class="form-control"
                 id="password"
                 placeholder="Enter Password"
@@ -57,9 +57,9 @@
               <input
                 type="text"
                 class="form-control"
-                id="latitude"
+                id="lat"
                 placeholder="Enter Latitude"
-                name="latitude"
+                name="lat"
                 [value]="latitude"
                 (change)="onLatitudeChange($event)"
               >
@@ -69,9 +69,9 @@
               <input
                 type="text"
                 class="form-control"
-                id="longitude"
+                id="lng"
                 placeholder="Enter Longitude"
-                name="longitude"
+                name="lng"
                 [value]="longitude"
                 (change)="onLongitudeChange($event)"
               >
@@ -81,10 +81,10 @@
               <input
                 type="number"
                 class="form-control"
-                id="amount"
+                id="maxAmount"
                 placeholder="Enter Amount"
-                name="amount"
-                [value]="amount"
+                name="maxAmount"
+                [value]="maxAmount"
                 (change)="onAmountChange($event )"
               >
             </div>

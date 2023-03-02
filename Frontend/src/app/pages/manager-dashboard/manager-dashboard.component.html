@@ -25,7 +25,7 @@
         <app-overview></app-overview>
       </div>
       <div class="management">
-        <app-management (newSellEvent)="buyEventHandler($event)" [command_list]="notify_list" ></app-management>
+        <app-management (newSellEvent)="sellEventHandler($event)" (newBuyEvent)="buyEventHandler($event)" [command_list]="notify_list" ></app-management>
       </div>
     </div>
 

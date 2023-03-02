@@ -71,7 +71,7 @@ namespace Backend.Controllers
         #endregion
 
 
-        #region RepairAsset
+        #region IsRepair
         [HttpPost]
         [Route("/IsRepair")]
         [ProducesResponseType(typeof(Boolean), StatusCodes.Status200OK)]
@@ -100,14 +100,14 @@ namespace Backend.Controllers
 
                 _logger.LogError(msg);
 
-                return Problem(title: "/AssetController/RepairAsset", detail: ex.Message, statusCode: StatusCodes.Status500InternalServerError);
+                return Problem(title: "/AssetController/IsRepair", detail: ex.Message, statusCode: StatusCodes.Status500InternalServerError);
             }
         }
         #endregion
 
 
         #region TotalAsset
-        [HttpPost]
+        [HttpGet]
         [Route("/TotalAsset/{UserEmail}")]
         [ProducesResponseType(typeof(AssetEntity), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -124,8 +124,8 @@ namespace Backend.Controllers
 
                 var user = users.Where(x => x.UserEmail == UserEmail).FirstOrDefault();
 
-                float longitude = 0;
-                float latitude = 0;
+                List<GetAssetVM> totalAssets = _mapper.Map<List<GetAssetVM>>(assets);
+
                 foreach (var asset in assets)
                 {
                     if (user.Role == Role.Admin)
@@ -137,18 +137,16 @@ namespace Backend.Controllers
                     {
                         if (asset.UserEmail == user.UserEmail)
                         {
-                            longitude = asset.Longitude;
-                            latitude = asset.Latitude;
                             totalAmounts += asset.Amount;
                             count++;
 
-                            var socketData = new PostTotalAsset { Count = count, TotalAmount = totalAmounts, Longitude = longitude, Latitude = latitude };
+                            var socketData = new PostTotalAsset { Count = count, TotalAmount = totalAmounts, Assets = totalAssets };
                             await _messageHub.Clients.All.SendTotalAsset(socketData);
                         }
                     }
                 }
 
-                PostTotalAsset data = new PostTotalAsset { Count = count, TotalAmount = totalAmounts, Longitude = longitude, Latitude = latitude };
+                PostTotalAsset data = new PostTotalAsset { Count = count, TotalAmount = totalAmounts, Assets = totalAssets };
                 return Ok(data);
             }
             catch(Exception ex)
@@ -245,7 +243,55 @@ namespace Backend.Controllers
 
                 return Problem(title: "/AssetController/BuyAsset", detail: ex.Message, statusCode: StatusCodes.Status500InternalServerError);
             }
+        }
+        #endregion
 
+
+        #region RepairAsset
+        [HttpGet]
+        [Route("/RepairAsset/{UserEmail}")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+
+        public async Task<IActionResult> RepairAsset(string UserEmail)
+        {
+            try
+            {
+                IEnumerable<AssetEntity> assets = await _genericService.GetAssetsList();
+
+                if (assets.Where(x => x.UserEmail == UserEmail).Count() == 0)
+                    return BadRequest("Not find manager");
+
+                var asset = assets.Where(x => x.UserEmail == UserEmail).First();
+
+                LogEntity log = new LogEntity
+                {
+                    From = string.Empty,
+                    Amount = 0,
+                    TankName = asset.TankName,
+                    Type = "Repair",
+                    CreatedDate = DateTime.UtcNow,
+                    UserEmail = asset.UserEmail,
+                };
+
+                await _genericService.SaveLogDetail(log);
+
+                asset.UpdatedDate = DateTime.UtcNow;
+
+                var save = _genericService.UpdateAssetDetail(asset);
+
+                return Ok(save);
+            }
+            catch (Exception ex)
+            {
+                var msg = $"Method: RepairAsset, Exception: {ex.Message}";
+
+                _logger.LogError(msg);
+
+                return Problem(title: "/AssetController/RepairAsset", detail: ex.Message, statusCode: StatusCodes.Status500InternalServerError);
+            }
         }
         #endregion
 
@@ -269,11 +315,6 @@ namespace Backend.Controllers
 
                 if (asset.Amount < model.Amount)
                     return BadRequest("Not enuogh amount to sell");
-
-
-                if ((asset.Amount - model.Amount) < asset.MinAmount)
-                    return BadRequest("Rest amount is below the min amount");
-
                 else
                 {
                     asset.Amount -= model.Amount;
@@ -290,6 +331,7 @@ namespace Backend.Controllers
 
                     await _genericService.SaveLogDetail(log);
                 }
+
                 var save = await _genericService.UpdateAssetDetail(asset);
                 return Ok(save);
             } catch(Exception ex)

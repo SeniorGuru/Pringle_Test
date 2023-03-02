@@ -44,7 +44,7 @@
     <div class="list-footer">
       <p class="label">Rows Per Page</p>
       <div class="indicator">
-          {{this.perPageCount * this.pageIndex + 1}} - {{this.perPageCount * (this.pageIndex + 1) + this.perPageList.length}} of {{assetList.length}}
+          {{this.perPageCount * this.pageIndex + 1}} - {{this.perPageCount * this.pageIndex + this.perPageList.length}} of {{assetList.length}}
           <div class="prev-btn" (click)="goToPrev()">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
               <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
@@ -73,7 +73,7 @@
         <div class="modal-body">
 
           <div class="mb-3 mt-3">
-            <label for="manager" class="form-label">Name:</label>
+            <label for="manager" class="form-label">Manager Name:</label>
             <input
               class="form-control"
               id="manager"
@@ -83,12 +83,12 @@
             >
           </div>
           <div class="mb-3 mt-3">
-            <label for="email" class="form-label">Email:</label>
+            <label for="email" class="form-label">Manager Email:</label>
             <input
               type="email"
               class="form-control"
-              id="email"
-              name="email"
+              id="email1"
+              name="email1"
               [value]="listData[index]?.userEmail || '' "
               disabled
             >
@@ -98,8 +98,8 @@
             <input
               type="text"
               class="form-control"
-              id="latitude"
-              name="latitude"
+              id="latitude1"
+              name="latitude1"
               [value]="listData[index]?.latitude || '' "
               disabled
             >
@@ -109,8 +109,8 @@
             <input
               type="text"
               class="form-control"
-              id="longitude"
-              name="longitude"
+              id="longitude1"
+              name="longitude1"
               [value]="listData[index]?.longitude || '' "
               disabled
             >
@@ -120,8 +120,8 @@
             <input
               type="text"
               class="form-control"
-              id="amount"
-              name="amount"
+              id="limitAmount"
+              name="limitAmount"
               [value]="listData[index]?.amount || 0 "
               disabled
             >
@@ -130,7 +130,7 @@
 
         <!-- Modal footer -->
         <div class="modal-footer">
-            <button type="button" class="btn btn-info" (click)="onViewDetail()">View detail</button>
+            <button type="button" class="btn btn-info" (click)="onViewDetail()">{{viewDetail === true ? 'Hide' : 'View'}} history </button>
             <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
         </div>
 
@@ -139,7 +139,7 @@
             <thead>
               <tr>
                 <th> Type </th>
-                <th> From </th>
+                <th> From/To </th>
                 <th> Amount </th>
                 <th> Date </th>
               </tr>

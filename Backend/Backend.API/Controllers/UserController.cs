@@ -10,6 +10,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using System.Runtime.InteropServices;
+using System.Linq;
 
 namespace Backend.API.Controllers
 {
@@ -45,7 +46,14 @@ namespace Backend.API.Controllers
         {
             try
             {
-                var results = await _genericService.GetUsersList();
+                var users = await _genericService.GetUsersList();
+
+                users = users.Where(x => x.UserEmail == model.UserEmail);
+
+                if (users.Count() == 0)
+                {
+                    return BadRequest("UserEmail not exists!");
+                }
 
                 var salt = System.Text.Encoding.UTF8.GetBytes(_config["Jwt:Key"]);
                 var password = System.Text.Encoding.UTF8.GetBytes(model.Password);
@@ -55,11 +63,11 @@ namespace Backend.API.Controllers
 
                 var comparePassword = Convert.ToBase64String(saltedHash);
 
-                var result = results.Where(x => (x.UserEmail == model.UserEmail && x.Password == comparePassword));
+                var result = users.Where(x => (x.UserEmail == model.UserEmail && x.Password == comparePassword));
 
                 if (result.Count() == 0)
                 {
-                    return NotFound();
+                    return BadRequest("Password doesn't match!");
                 }
 
                 string token = GenerateToken(result.First());
@@ -127,6 +135,75 @@ namespace Backend.API.Controllers
                 _logger.LogError(msg);
 
                 return Problem(title: "/UserController/RegisterManager", detail: ex.Message, statusCode: StatusCodes.Status500InternalServerError);
+            }
+        }
+        #endregion
+
+
+        #region Change Password
+        // Method to Change Password
+        [HttpPost]
+        [Route("/ChangePassword")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        public async Task<IActionResult> ChangePassword(ChangePasswordVM model)
+        {
+            try
+            {
+                var users = await _genericService.GetUsersList();
+
+                if (users.Where(x => x.UserEmail == model.UserEmail).Count() == 0)
+                {
+                    return BadRequest("UserEmail not exists!");
+                }
+
+                var user = users.Where(x => x.UserEmail == model.UserEmail).FirstOrDefault();
+
+                var salt = System.Text.Encoding.UTF8.GetBytes(_config["Jwt:Key"]);
+                var password = System.Text.Encoding.UTF8.GetBytes(model.OldPassword);
+
+                var hmacSHA1 = new HMACSHA1(salt);
+                var saltedHash = hmacSHA1.ComputeHash(password);
+
+                var comparePassword = Convert.ToBase64String(saltedHash);
+
+                if (users.Where(x => x.Password == comparePassword).Count() == 0)
+                {
+                    return BadRequest("Old Password doesn't match!");
+                }
+
+                #region setNewPassowrd
+                salt = System.Text.Encoding.UTF8.GetBytes(_config["Jwt:Key"]);
+                password = System.Text.Encoding.UTF8.GetBytes(model.NewPassword);
+
+                hmacSHA1 = new HMACSHA1(salt);
+                saltedHash = hmacSHA1.ComputeHash(password);
+
+                comparePassword = Convert.ToBase64String(saltedHash);
+
+                user.Password = comparePassword;
+
+                #endregion
+                var save = await _genericService.UpdateUserDetail(user);
+
+                if (save == null)
+                {
+                    return NotFound();
+                }
+
+                string token = GenerateToken(save);
+
+                return Ok(token);
+            }
+            catch (Exception ex)
+            {
+                var msg = $"Method: ChangePassword, Exception: {ex.Message}";
+
+                _logger.LogError(msg);
+
+                return Problem(title: "/UserController/ChangePassword", detail: ex.Message, statusCode: StatusCodes.Status500InternalServerError);
             }
         }
         #endregion
