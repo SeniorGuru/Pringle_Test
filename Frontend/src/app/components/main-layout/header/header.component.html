@@ -47,7 +47,7 @@
                 placeholder="Enter New Pasword"
                 name="new_pwd"
                 [value]="newPwd"
-                (click)="onNewPassword($event)"
+                (change)="onNewPassword($event)"
               >
             </div>
             <div class="mb-3">
@@ -59,7 +59,7 @@
                 placeholder="Retype New Password"
                 name="confirm_pwd"
                 [value]="confirmPwd"
-                (click)="onConfirmPassword($event)"
+                (change)="onConfirmPassword($event)"
               >
             </div>
           </form>

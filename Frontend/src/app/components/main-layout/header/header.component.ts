@@ -48,18 +48,16 @@ export class HeaderComponent implements OnInit {
       alert(`Password is do not matched`);
     }
     else {
-      try{
         let res = await axios.post(`${PRIVATE_URI}ChangePassword`, {
           userEmail: getItem('user_email'),
           oldPassword: this.oldPwd,
           newPassword: this.newPwd
-        }, header)
-        if(res.status === 200) {
+        }, header) .then(function() {
           alert("Successfully changed")
-        }
-      } catch(error) {
-        alert(error)
-      }
+
+        }) .catch(function(error) {
+        alert(error.response.data)
+      })
     }
   }
 

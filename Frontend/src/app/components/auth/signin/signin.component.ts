@@ -50,8 +50,7 @@ export class SigninComponent implements OnInit {
         else
           trouter.navigate(['/dashboard/manager'])
     }) .catch(function (error) {
-      alert(error)
-      console.log(error)
+      alert(error.response.data)
     })
 
   }
